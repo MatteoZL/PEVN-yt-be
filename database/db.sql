@@ -18,7 +18,7 @@ CREATE TABLE course (
     id_c SERIAL PRIMARY KEY,
     p_id INTEGER REFERENCES professor(id_p),
     c_name TEXT NOT NULL,
-    c_decription TEXT NOT NULL
+    c_description TEXT NOT NULL
 );
 
 CREATE TABLE studentvscourse (
