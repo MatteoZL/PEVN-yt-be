@@ -1,4 +1,5 @@
 import pool from "../database/keys";
+import cloudinary from '../lib/cloudinary';
 
 const professor = {};
 
@@ -78,8 +79,49 @@ professor.getCourses = async (req, res) => {
 }
 
 // ASSIGNMENTS
+professor.createAssignment = async (req, res) => {
+    const id_c = req.params.id_c;
+    const {a_name, a_description} = req.body;
+    const file = await cloudinary(req.files.a_file.tempFilePath);
+    try {
+        await pool.query('INSERT INTO assignment (c_id, a_name, a_description, a_file) VALUES ($1, $2, $3, $4)', [id_c, a_name, a_description, file]);
+        res.status(200).json({
+            message: 'Successfull added assignment',
+            assignment: {a_name, a_description, file}
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'An error has ocurred',
+            error
+        })
+    }
+};
 
+professor.getAssginments = async (req, res) => {
+    const id_c = req.params.id_c;
+    try {
+        const assignments = await (await pool.query('SELECT * FROM assignment WHERE c_id=$1', [id_c])).rows;
+        res.status(200).json(assignments);
+    } catch (error) {
+        res.status(500).json({
+            message: 'An error has ocurred',
+            error
+        })
+    }
+}
 
 // DELIVERIES
+professor.getDeliveries = async (req, res) => {
+    const id_a = req.params.id_a;
+    try {
+        const deliveries = await (await pool.query('SELECT * FROM delivery WHERE a_id=$1', [id_a])).rows;
+        res.status(200).json(deliveries);
+    } catch (error) {
+        res.status(500).json({
+            message: 'An error has ocurred',
+            error
+        })
+    }
+}
 
 module.exports = professor;
